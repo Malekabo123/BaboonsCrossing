@@ -29,7 +29,7 @@ public class CrossingCanyon <E>{
 
         toWestCounter++;
         if (toWestCounter == 1){ //the first baboon crossing to west
-            toWestSwitch.acquire(); // the way is reserved as to west now
+            empty.acquire(); // the way is reserved as to west now
         }
 
         System.out.println("I am on the rope going west, count= "+toWestCounter);
@@ -45,7 +45,7 @@ public class CrossingCanyon <E>{
 
         toWestCounter--;
         if(toWestCounter == 0){
-            toWestSwitch.release(); //the way is empty now
+            empty.release(); //the way is empty now
         }
         System.out.println("I've crossed the rope and in west now, count= "+toWestCounter);
 
@@ -57,7 +57,7 @@ public class CrossingCanyon <E>{
 
         toEastCounter++;
         if (toEastCounter == 1){
-            toEastSwitch.acquire(); // the way is reserved as to east now
+            empty.acquire(); // the way is reserved as to east now
         }
         System.out.println("I am on the rope going east, count= "+toEastCounter);
 
@@ -68,8 +68,8 @@ public class CrossingCanyon <E>{
         toEastMutex.acquire();
 
         toEastCounter--;
-        if (toEastCounter == 1){
-            toEastSwitch.release(); //the way is empty now
+        if (toEastCounter == 0){
+            empty.release(); //the way is empty now
         }
         System.out.println("I've crossed the rope and in east now, count= "+toEastCounter);
 
