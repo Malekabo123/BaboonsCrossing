@@ -2,78 +2,88 @@ import java.util.concurrent.Semaphore;
 
 public class CrossingCanyon <E>{
 
-    private static final int ROPECAPACITY = 5;
+    private static final int ROPECAPACITY = 4; // 4 because semaphores take values starting from 0, so it's gonna be 0 1 2 3 4 which is 5 values
     private Semaphore toWestMutex;
     private Semaphore toEastMutex;
-    //private Semaphore empty; //1 if empty, 0 if full
+    private Semaphore empty; //1 if empty, 0 if full
 
-    private Semaphore toWestSwitch;
-    private Semaphore toEastSwitch;
-    private int toWestCounter;
+    private Semaphore toWestCount;
+    private Semaphore toEastCount;
+    private Semaphore blockingEntrance; //for starvation
+    private int toWestCounter; //ensure that just 5 baboons can be at the rope at the same time
     private int toEastCounter;
-    private int onRope;
 
     public CrossingCanyon(){
-        this.toWestMutex = new Semaphore(ROPECAPACITY);
-        this.toEastMutex = new Semaphore(ROPECAPACITY);
-        //this.empty = new Semaphore(1);
-        this.onRope = 0;
-        this.toWestSwitch = new Semaphore(1);
-        this.toEastSwitch = new Semaphore(1);
+        this.toWestMutex = new Semaphore(1);
+        this.toEastMutex = new Semaphore(1);
+        this.empty = new Semaphore(1);
+        this.toWestCounter = 0;
+        this.toEastCounter = 0;
+        this.toWestCount = new Semaphore(ROPECAPACITY);
+        this.toEastCount = new Semaphore(ROPECAPACITY);
+        this.blockingEntrance = new Semaphore(1);
     }
 
 
     public void acquireGoToWest() throws InterruptedException {
-        //empty.acquire();
+        
+        blockingEntrance.acquire(); //changing its position leads to deadlock
+        toWestCount.acquire();
         toWestMutex.acquire();
 
-        toWestCounter++;
-        if (toWestCounter == 1){ //the first baboon crossing to west
+        this.toWestCounter++;
+        if (this.toWestCounter == 1){ //the first baboon crossing to west
             empty.acquire(); // the way is reserved as to west now
         }
 
-        System.out.println("I am on the rope going west, count= "+toWestCounter);
-        System.out.println("Direction is: "+toWestSwitch.toString());
-
+        blockingEntrance.release(); //changing its position leads to deadlock
         toWestMutex.release();
-
+        
     }
 
 
     public void releaseGoToWest() throws InterruptedException {
+        
+        toWestCount.release();
         toWestMutex.acquire();
 
-        toWestCounter--;
-        if(toWestCounter == 0){
+        this.toWestCounter--;
+        if(this.toWestCounter == 0){
             empty.release(); //the way is empty now
         }
-        System.out.println("I've crossed the rope and in west now, count= "+toWestCounter);
 
         toWestMutex.release();
+        
     }
 
     public void acquireGoToEast() throws InterruptedException {
+        
+        blockingEntrance.acquire();
+        toEastCount.acquire();
         toEastMutex.acquire();
 
-        toEastCounter++;
-        if (toEastCounter == 1){
+        this.toEastCounter++;
+        if (this.toEastCounter == 1){
             empty.acquire(); // the way is reserved as to east now
         }
-        System.out.println("I am on the rope going east, count= "+toEastCounter);
 
+        blockingEntrance.release();
         toEastMutex.release();
+        
     }
 
     public void releaseGoToEast() throws InterruptedException {
+        
+        toEastCount.release();
         toEastMutex.acquire();
 
-        toEastCounter--;
-        if (toEastCounter == 0){
+        this.toEastCounter--;
+        if (this.toEastCounter == 0){
             empty.release(); //the way is empty now
         }
-        System.out.println("I've crossed the rope and in east now, count= "+toEastCounter);
 
         toEastMutex.release();
+        
     }
 
 }
