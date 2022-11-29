@@ -30,13 +30,14 @@ public class CrossingCanyon <E>{
         blockingEntrance.acquire(); //changing its position leads to deadlock
         toWestCount.acquire();
         toWestMutex.acquire();
+        blockingEntrance.release(); //changing its position leads to deadlock
 
         this.toWestCounter++;
         if (this.toWestCounter == 1){ //the first baboon crossing to west
             empty.acquire(); // the way is reserved as to west now
         }
 
-        blockingEntrance.release(); //changing its position leads to deadlock
+        
         toWestMutex.release();
 
     }
@@ -61,13 +62,14 @@ public class CrossingCanyon <E>{
         blockingEntrance.acquire();
         toEastCount.acquire();
         toEastMutex.acquire();
+        blockingEntrance.release();
 
         this.toEastCounter++;
         if (this.toEastCounter == 1){
             empty.acquire(); // the way is reserved as to east now
         }
 
-        blockingEntrance.release();
+        
         toEastMutex.release();
 
     }
