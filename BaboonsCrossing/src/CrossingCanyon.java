@@ -2,7 +2,7 @@ import java.util.concurrent.Semaphore;
 
 public class CrossingCanyon <E>{
 
-    private static final int ROPECAPACITY = 4; // 4 because semaphores take values starting from 0, so it's gonna be 0 1 2 3 4 which is 5 values
+    private static final int ROPECAPACITY = 5; // at value 0 the semaphore stops
     private Semaphore toWestMutex;
     private Semaphore toEastMutex;
     private Semaphore empty; //1 if empty, 0 if full
