@@ -12,7 +12,6 @@ public class CrossingCanyon <E>{
     private Semaphore blockingEntrance; //for starvation
     private int toWestCounter; //ensure that just 5 baboons can be at the rope at the same time
     private int toEastCounter;
-    private int count;
 
     public CrossingCanyon(){
         this.toWestMutex = new Semaphore(1);
@@ -23,7 +22,6 @@ public class CrossingCanyon <E>{
         this.toWestCount = new Semaphore(ROPECAPACITY);
         this.toEastCount = new Semaphore(ROPECAPACITY);
         this.blockingEntrance = new Semaphore(1);
-        this.count = 0;
     }
 
 
@@ -39,7 +37,6 @@ public class CrossingCanyon <E>{
             empty.acquire(); // the way is reserved as to west now
         }
 
-        System.out.println("On the rope = "+(++count));
         toWestMutex.release();
 
     }
@@ -55,7 +52,6 @@ public class CrossingCanyon <E>{
             empty.release(); //the way is empty now
         }
 
-        System.out.println("On the rope = "+(--count));
         toWestMutex.release();
 
     }
@@ -72,7 +68,6 @@ public class CrossingCanyon <E>{
             empty.acquire(); // the way is reserved as to east now
         }
 
-        System.out.println("On the rope = "+(++count));
         toEastMutex.release();
 
     }
@@ -87,7 +82,6 @@ public class CrossingCanyon <E>{
             empty.release(); //the way is empty now
         }
 
-        System.out.println("On the rope = "+(--count));
         toEastMutex.release();
 
     }
