@@ -11,13 +11,39 @@ public class ToEastBaboon implements Runnable{
     public void run(){
         while (true){
             try {
-                Thread.sleep((long) ((int) 5*Math.random()*1000));
-                crossingCanyon.acquireGoToEast();
-                System.out.println("I am baboon "+id+" going east");
+                Thread.sleep((long) (Math.random()*500));
+                { //going to east
+                    crossingCanyon.blockingEntrance.acquire();
+                    crossingCanyon.toEastMutex.acquire();
+                    crossingCanyon.blockingEntrance.release();
 
-                Thread.sleep((long) ((int) 5*Math.random()*1000));
-                crossingCanyon.releaseGoToEast();
-                System.out.println("I am baboon "+id+" arrived east");
+                    crossingCanyon.toEastCounter++;
+
+                    if (crossingCanyon.toEastCounter == 1) {
+                        crossingCanyon.rope.acquire(); // the way is reserved as to east now
+                    }
+                    crossingCanyon.toEastMutex.release();
+
+
+                    crossingCanyon.toEastCount.acquire();
+                }
+
+                System.out.println("I am baboon "+id+" going east.\n");
+                Thread.sleep((long) (Math.random()*500));
+                System.out.println("I am baboon "+id+" arrived east.\n");
+
+                { //reached east
+                    crossingCanyon.toEastCount.release();
+                    crossingCanyon.toEastMutex.acquire();
+
+                    crossingCanyon.toEastCounter--;
+
+                    if (crossingCanyon.toEastCounter == 0) {
+                        crossingCanyon.rope.release(); //the way is empty now
+                    }
+
+                    crossingCanyon.toEastMutex.release();
+                }
 
             }catch (Exception e){
 
